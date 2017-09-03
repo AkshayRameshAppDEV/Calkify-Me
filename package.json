@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/AkshayRameshAppDEV/News-Me#readme",
   "dependencies": {
+    "http": "0.0.0",
+    "https": "^1.0.0",
     "request": "^2.81.0"
   }
 }

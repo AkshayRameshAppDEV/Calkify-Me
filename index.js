@@ -1,3 +1,4 @@
+'use strict'
 var request = require("request");
 var http = require('http');
 var https = require('https');
@@ -17,14 +18,16 @@ exports.handler = function (event, context,callback) {
                 function callback(sessionAttributes, speechletResponse) {
                     context.succeed(buildResponse(sessionAttributes, speechletResponse));
                 });
-        } else if (event.request.type === "IntentRequest") {
-            console.log("HELLO I AM in initial intentt request")
+        } else if (event.request.type === "IntentRequest") 
+        {
+           
             onIntent(event.request,
                 event.session,
                 function callback(sessionAttributes, speechletResponse) {
                     context.succeed(buildResponse(sessionAttributes, speechletResponse));
                 });
-        } else if (event.request.type === "SessionEndedRequest") {
+        }
+        else if (event.request.type === "SessionEndedRequest") {
             onSessionEnded(event.request, event.session);
             context.succeed();
         }
@@ -58,20 +61,47 @@ function onIntent(intentRequest, session, callback) {
     // dispatch custom intents to handlers here
     if (intentName == "findDerivativeIntent") 
         {
-            console.log("HELLO I AM IN EVENT")
-            handleGetInfoIntent(intent, session, callback)
+           
+            handlefindDerivativeIntent(intent, session, callback)
              
-        } 
+        }
+    else if (intentName == "findDerivativeIntentConstant") 
+        {
+           
+            handlefindDerivativeIntentConstant(intent, session, callback)
+             
+        }
+    
+        else if (intentName == "findDerivativeIntentConstantPlusX") 
+        {
+            
+             handlefindDerivativeIntentConstantPlusX(intent, session, callback)
+             
+        }
+     else if (intentName == "findDerivativeIntentConstantXPlus")
+    {
+        handlefindDerivativeIntentConstantXPlus(intent,session,callback)
+    }
+    else if (intentName == "constantTimes")
+    {
+        handleconstantTimes(intent,session,callback)
+    }
+    else if (intentName == "AMAZON.StopIntent")
+    {
+        callback(session.attributes,buildSpeechletResponse("Derive Me!","GOOD BYE! Come back again by telling Alexa, start Derive Me!", "", true))
+
+    }
+    else if (intentName == "AMAZON.HelpIntent")
+    {
+        getTutorial(callback);
+    }
+        
     else 
         {
-            throw "Invalid intent"
+            throw "Invalid Intent"
         }
 }
 
-/**
- * Called when the user ends the session.
- * Is not called when the skill returns shouldEndSession=true.
- */
 function onSessionEnded(sessionEndedRequest, session) {
 
 }
@@ -79,11 +109,12 @@ function onSessionEnded(sessionEndedRequest, session) {
 // ------- Skill specific logic -------
 
 function getWelcomeResponse(callback) {
-    var speechOutput = "Do you want to derive a particular expression ? For example, you can ask what is the derivative of x power 2"
+    var speechOutput = "Welcome to Derive Me! Do you want to derive a particular expression ? For example, you can ask what is the derivative of x power 2."+
+                        " Or go down to the tutorial section by asking can you help me."
 
     var reprompt = "Do you want to find derivative for some expression?"
 
-    var header = "Derivative"
+    var header = "Derive Me!"
 
     var shouldEndSession = false
 
@@ -96,12 +127,62 @@ function getWelcomeResponse(callback) {
 
 }
 
+function getTutorial(callback) {
+    var speechOutput = "Welcome to Derive Me tutorials! "+
+                        "For now this skill only accept positive numbers and expressions like 7, 5x+7, 9x squared, 7x+12, x cubed."+
+                        " To find the derivative of x squared, you can ask what is the derivative of x power 2."+
+                        " For constant such as 7, you can ask what is the derivative of 7."+
+                        " For 5x squared, you can ask what is the derivative of 5 times x power 2."+
+                        " For 3 + x cube, you can ask what is the derivative of 3 plus x power 3."+
+                        " For x squared + 6, you can ask what is the derivative of x power 2 plus 6."+
+                        " Or you can say stop to stop the skill"
 
+    var reprompt = "Do you want to find derivative for some expression?"
+
+    var header = "Derive Me!"
+
+    var shouldEndSession = false
+
+    var sessionAttributes = {
+        "speechOutput" : speechOutput,
+        "repromptText" : reprompt
+    }
+
+    callback(sessionAttributes, buildSpeechletResponse(header, speechOutput, reprompt, shouldEndSession))
+
+}
+//URL's////////////////////////////////////////////////////////////////////
 function url(num)
 {
     return "https://newton.now.sh/derive/x^"+num
 }
 
+function url2(num1,num2)
+{
+    return "https://newton.now.sh/derive/"+num1+"x^"+num2
+}
+
+function url3(num1)
+{
+    return "https://newton.now.sh/derive/"+num1
+}
+function url4(num1,num2,num3)
+{
+    return "https://newton.now.sh/derive/"+num1+"+"+num2+"x^"+num3;
+}
+function url5(num1,num2,num3)
+{
+    return "https://newton.now.sh/derive/"+num1+"x^"+num2+"+"+num3;
+}
+function urlConstant(num1,num2)
+{
+    return "https://newton.now.sh/derive/"+num1+"x^"+num2
+}
+
+//URL's////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function getJSON(pn,callback)
 {
     console.log("The pn is: "+pn)
@@ -111,10 +192,10 @@ function getJSON(pn,callback)
          var d = JSON.parse(body)
          
          var result = d.result
-         console.log("The result is: "+result)
+         
          if(result.length > 0)
          {
-             console.log("The result is: "+result)
+             
              callback(result);
          }
          else
@@ -124,21 +205,133 @@ function getJSON(pn,callback)
 
 
     })
-    
-
-        
-
 }
 
 
+function getJSON2(pn1,pn2,callback)
+{
+    
+    
+     request.get(url2(pn1,pn2),function(error,response,body){
+
+         var d = JSON.parse(body)
+         
+         var result = d.result
+         
+         if(result.length > 0)
+         {
+             callback(result)
+         }
+         
 
 
+    })
+}
 
 
-function handleGetInfoIntent(intent, session, callback) 
+ 
+
+function getJSON3(pn,callback)
+{
+    console.log("The pn is: "+pn)
+    
+     request.get(url3(pn),function(error,response,body){
+
+         var d = JSON.parse(body)
+         
+         var result = d.result
+         
+         if(result.length > 0)
+         {
+             
+             callback(result);
+         }
+         else
+         {
+             callback("ERROR");
+        }
+
+
+    })
+}
+
+function getJSON4(pn1,pn2,pn3,callback)
+{
+    
+    
+     request.get(url4(pn1,pn2,pn3),function(error,response,body){
+
+         var d = JSON.parse(body)
+         
+         var result = d.result
+         
+         if(result.length > 0)
+         {
+             
+             callback(result);
+         }
+         else
+         {
+             callback("ERROR");
+        }
+
+
+    })
+}
+
+function getJSON5(pn1,pn2,pn3,callback)
+{
+    
+    
+     request.get(url5(pn1,pn2,pn3),function(error,response,body){
+
+         var d = JSON.parse(body)
+         
+         var result = d.result
+         
+         if(result.length > 0)
+         {
+             
+             callback(result);
+         }
+         else
+         {
+             callback("ERROR");
+        }
+
+
+    })
+}
+
+function getJSONConstant(pn1,pn2,callback)
+{
+    
+    
+     request.get(urlConstant(pn1,pn2),function(error,response,body){
+
+         var d = JSON.parse(body)
+         
+         var result = d.result
+         
+         if(result.length > 0)
+         {
+             
+             callback(result);
+         }
+         else
+         {
+             callback("ERROR");
+        }
+
+
+    })
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function handlefindDerivativeIntent(intent, session, callback) 
 {
 
-    console.log("HELLO I AM IN handleGetInfoIntent");
+   
     var speechOutput = "we have an error";
     var powernum = intent.slots.powerNumber.value;
     getJSON(powernum,function(data){
@@ -146,26 +339,114 @@ function handleGetInfoIntent(intent, session, callback)
         {
             var speechOutput = data;
         }
-        callback(session.attributes,buildSpeechletResponse("Get Info", speechOutput, "Do you want to hear about some facts?", false))
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
 
     })
     
-    
-    
-    
-    
+}
 
-    
-    
-    
-    
-    
-    
-    
+function handlefindDerivativeIntentConstantTimes(intent, session, callback) 
+{
 
-    
+   
+    var speechOutput = "we have an error";
+    var powernum = intent.slots.prInitial.value;
+    var powernum1 = intent.slots.prNumber.value;
+    getJSON2(powernum,powernum1,function(data){
+        if(data != "ERROR")
+        {
+            var speechOutput = data;
+        }
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
+
+    })
     
 }
+
+
+function handlefindDerivativeIntentConstant(intent, session, callback) 
+{
+
+   
+    var speechOutput = "we have an error";
+    var powernum = intent.slots.powerNumberConstant.value;
+    getJSON3(powernum,function(data){
+        if(data != "ERROR")
+        {
+            var speechOutput = data;
+        }
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
+
+    })
+    
+}
+
+function handlefindDerivativeIntentConstantPlusX(intent, session, callback) 
+{
+
+   
+    var speechOutput = "we have an error";
+    var powernumbernonstantplusXconstant = intent.slots.powerNumberConstantPlusXconstant.value;
+    var powernumberconstantplusXnumber = intent.slots.powerNumberConstantPlusXnumber.value;
+    var powernumberconstantplusXnumberend = intent.slots.powerNumberConstantPlusXnumberend.value;
+    
+    getJSON4(powernumbernonstantplusXconstant,powernumberconstantplusXnumber,powernumberconstantplusXnumberend,function(data)
+    {
+        if(data != "ERROR")
+        {
+            var speechOutput = data;
+        }
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
+
+    })
+    
+}
+
+
+function  handlefindDerivativeIntentConstantXPlus(intent, session, callback) 
+{
+
+     
+    //var speechOutput = "we have an error";
+    var power1 = intent.slots.number.value;
+    var power2 = intent.slots.constant.value;
+    var power3 = intent.slots.power.value;
+  
+    
+    
+    getJSON5(power1,power2,power3,function(data)
+    {
+        if(data != "ERROR")
+        {
+            console.log(speechOutput)
+            var speechOutput = data;
+        }
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
+
+    })
+    
+}
+function  handleconstantTimes(intent, session, callback) 
+{
+
+     
+    
+    var POT = intent.slots.pot.value;
+    var mott = intent.slots.mot.value;
+   
+    getJSONConstant(POT,mott,function(data)
+    {
+        if(data != "ERROR")
+        {
+            
+            var speechOutput = data;
+        }
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
+
+    })
+    
+}
+
 
 
 // ------- Helper functions to build responses for Alexa -------
