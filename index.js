@@ -82,9 +82,9 @@ function onIntent(intentRequest, session, callback) {
     {
         handlefindDerivativeIntentConstantXPlus(intent,session,callback)
     }
-    else if (intentName == "constantTimes")
+    else if (intentName == "findCon")
     {
-        handleconstantTimes(intent,session,callback)
+        handlefindCon(intent,session,callback)
     }
     else if (intentName == "AMAZON.StopIntent")
     {
@@ -102,7 +102,8 @@ function onIntent(intentRequest, session, callback) {
         }
 }
 
-function onSessionEnded(sessionEndedRequest, session) {
+function onSessionEnded(sessionEndedRequest, session) 
+{
 
 }
 
@@ -228,9 +229,6 @@ function getJSON2(pn1,pn2,callback)
     })
 }
 
-
- 
-
 function getJSON3(pn,callback)
 {
     console.log("The pn is: "+pn)
@@ -328,122 +326,184 @@ function getJSONConstant(pn1,pn2,callback)
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function handlefindDerivativeIntent(intent, session, callback) 
+function  handlefindDerivativeIntent(intent, session, callback) 
 {
-
    
-    var speechOutput = "we have an error";
+    
     var powernum = intent.slots.powerNumber.value;
-    getJSON(powernum,function(data){
+    var test;
+    if(isNaN(powernum) === false)
+    {
+        test = true;
+    }
+    if (powernum !== null && test) 
+    {
+        getJSON(powernum,function(data){
         if(data != "ERROR")
         {
             var speechOutput = data;
         }
-        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput,"", true))
 
-    })
+         })
+        
+    }
+    else
+    {
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "Please tell a number along with invocation","", true))
+
+    }
+    
     
 }
 
-function handlefindDerivativeIntentConstantTimes(intent, session, callback) 
-{
 
-   
-    var speechOutput = "we have an error";
-    var powernum = intent.slots.prInitial.value;
-    var powernum1 = intent.slots.prNumber.value;
-    getJSON2(powernum,powernum1,function(data){
-        if(data != "ERROR")
-        {
-            var speechOutput = data;
-        }
-        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
-
-    })
-    
-}
 
 
 function handlefindDerivativeIntentConstant(intent, session, callback) 
 {
 
    
-    var speechOutput = "we have an error";
     var powernum = intent.slots.powerNumberConstant.value;
-    getJSON3(powernum,function(data){
+    var test;
+    if(isNaN(powernum) === false)
+    {
+        test = true;
+    }
+    if (powernum !== null && test) 
+    {
+        getJSON3(powernum,function(data){
         if(data != "ERROR")
         {
             var speechOutput = data;
         }
-        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput,"", true))
 
-    })
+         })
+        
+    }
+    else
+    {
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "Please tell a number along with invocation","", true))
+
+    }
+    
     
 }
 
-function handlefindDerivativeIntentConstantPlusX(intent, session, callback) 
+function  handlefindDerivativeIntentConstantPlusX(intent, session, callback) 
 {
 
    
-    var speechOutput = "we have an error";
-    var powernumbernonstantplusXconstant = intent.slots.powerNumberConstantPlusXconstant.value;
-    var powernumberconstantplusXnumber = intent.slots.powerNumberConstantPlusXnumber.value;
-    var powernumberconstantplusXnumberend = intent.slots.powerNumberConstantPlusXnumberend.value;
     
-    getJSON4(powernumbernonstantplusXconstant,powernumberconstantplusXnumber,powernumberconstantplusXnumberend,function(data)
+    var pone = intent.slots.powerNumberConstantPlusXconstant.value;
+    var ptwo = intent.slots.powerNumberConstantPlusXnumber.value;
+    var pthree = intent.slots.powerNumberConstantPlusXnumberend.value;
+    
+    var test;
+    
+    if(isNaN(pone) === false && isNaN(ptwo) === false && isNaN(pthree) === false)
     {
+        test = true;
+    }
+    
+    if(pone !== null && ptwo !== null && pthree !== null && test)
+    {
+       getJSON4(pone,ptwo,pthree,function(data)
+        {
         if(data != "ERROR")
         {
             var speechOutput = data;
         }
-        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "", true))
 
-    })
+      }) 
+    }
+    else
+    {
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "Please tell a number along with invocation","", true))
+
+    }
+    
+    
     
 }
 
 
-function  handlefindDerivativeIntentConstantXPlus(intent, session, callback) 
+function   handlefindDerivativeIntentConstantXPlus(intent, session, callback) 
 {
 
      
-    //var speechOutput = "we have an error";
-    var power1 = intent.slots.number.value;
-    var power2 = intent.slots.constant.value;
-    var power3 = intent.slots.power.value;
-  
+    var pone = intent.slots.number.value;
+    var ptwo = intent.slots.constant.value;
+    var pthree = intent.slots.power.value;
     
+    var test;
     
-    getJSON5(power1,power2,power3,function(data)
+    if(isNaN(pone) === false && isNaN(ptwo) === false && isNaN(pthree) === false)
+    {
+        test = true;
+    }
+    
+    if(pone !== null && ptwo !== null && pthree !== null && test)
+    {
+        getJSON5(pone,ptwo,pthree,function(data)
     {
         if(data != "ERROR")
         {
             console.log(speechOutput)
             var speechOutput = data;
         }
-        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "", true))
 
     })
+    }
+    else
+    {
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "Please tell a number along with invocation","", true))
+
+    }
+    
+    
+  
+    
+    
+   
     
 }
-function  handleconstantTimes(intent, session, callback) 
+function  handlefindCon(intent, session, callback) 
 {
 
      
     
     var POT = intent.slots.pot.value;
     var mott = intent.slots.mot.value;
-   
-    getJSONConstant(POT,mott,function(data)
+    var test;
+    
+    if(isNaN(POT) === false && isNaN(mott) === false)
     {
+        test = true;
+    }
+    if(POT !== null && mott !== null && test)
+     {
+         getJSONConstant(POT,mott,function(data)
+        {
         if(data != "ERROR")
         {
             
             var speechOutput = data;
         }
-        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "Ask some more derivative questions.", false))
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "The derivative is "+speechOutput, "", true))
 
-    })
+      })
+     }
+     else
+    {
+        callback(session.attributes,buildSpeechletResponse("Derive Me!", "Please tell a number along with invocation","", true))
+
+    }
+   
+    
     
 }
 
